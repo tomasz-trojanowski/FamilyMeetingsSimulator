@@ -1,7 +1,5 @@
 import streamlit as st
 import numpy as np
-import matplotlib.pyplot as plt
-import seaborn as sns
 
 def monte_carlo_simulacja(srednia_spotkan, odchylenie_std, wiek_start, srednia_zycia, zdrowie, uzywki, liczba_symulacji):
     modyfikator_zdrowia = 1.0 + (0.1 if zdrowie == 'dobry' else -0.1 if zdrowie == 'zły' else 0)
@@ -21,7 +19,6 @@ def monte_carlo_simulacja(srednia_spotkan, odchylenie_std, wiek_start, srednia_z
 st.set_page_config(page_title='Symulacja Spotkań Rodzinnych', layout='wide')
 st.title('Symulacja przyszłych spotkań z rodzicami')
 
-# Wybór roli użytkownika
 role = st.radio("Wybierz swoją rolę:", ('Dziecko', 'Rodzic'))
 
 if role == 'Dziecko':
@@ -41,15 +38,7 @@ liczba_symulacji = st.sidebar.slider('Liczba symulacji:', min_value=1000, max_va
 if st.button('Uruchom symulację'):
     wyniki = monte_carlo_simulacja(srednia_spotkan, odchylenie_std, wiek_start, srednia_zycia, zdrowie, uzywki, liczba_symulacji)
     st.subheader('Wyniki symulacji')
-    fig, ax = plt.subplots()
-    sns.histplot(wyniki, kde=True, color='skyblue', ax=ax)
-    ax.set_title('Histogram przewidywanych spotkań')
-    ax.set_xlabel('Liczba spotkań')
-    ax.set_ylabel('Częstotliwość')
-    st.pyplot(fig)
-
-    fig2, ax2 = plt.subplots()
-    sns.boxplot(x=wyniki, color='lightgreen', ax=ax2)
-    ax2.set_title('Boxplot przewidywanych spotkań')
-    ax2.set_xlabel('Liczba spotkań')
-    st.pyplot(fig2)
+    st.write(f'Średnia liczba przewidywanych spotkań: {np.mean(wyniki):.2f}')
+    st.write(f'Mediana liczby przewidywanych spotkań: {np.median(wyniki):.2f}')
+    st.write('Detalizacja wszystkich symulowanych wyników:')
+    st.dataframe(wyniki)
