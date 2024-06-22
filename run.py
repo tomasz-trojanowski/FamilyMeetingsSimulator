@@ -17,8 +17,6 @@ def monte_carlo_simulacja(wiek_start, srednia_spotkan, srednia_zycia, zdrowie, u
 # Ustawienie Streamlit
 st.set_page_config(page_title='Symulacja Spotkań Rodzinnych', layout='wide')
 st.title('Symulacja przyszłych spotkań z rodzicami')
-st.image('path_to_image.jpg', caption='Rodzinne chwile')  # Zmień 'path_to_image.jpg' na ścieżkę do Twojego obrazu
-
 st.header("Czy wiesz, że liczba spotkań z Twoimi rodzicami jest policzalna?")
 st.write("""
 Zastanawiałeś się kiedyś, ile razy jeszcze będziesz mógł spotkać się ze swoimi rodzicami? Nasza symulacja pomoże Ci oszacować tę liczbę na podstawie kilku kluczowych czynników.
