@@ -1,12 +1,14 @@
 import streamlit as st
 import numpy as np
 
-def monte_carlo_simulacja(wiek_start, srednia_spotkan, srednia_zycia, zdrowie, uzywki, styl_zycia, liczba_symulacji):
+def monte_carlo_simulacja(wiek_start, srednia_spotkan, srednia_zycia, zdrowie, uzywki, styl_zycia, styl_odzywiania, liczba_symulacji):
     zdrowie_modyfikator = {'dobry': 1.1, 'średni': 1.0, 'zły': 0.9}
     uzywki_modyfikator = {'tak': 0.9, 'nie': 1.0}
     styl_zycia_modyfikator = {'aktywny': 1.05, 'umiarkowany': 1.0, 'siedzący': 0.95}
+    styl_odzywiania_modyfikator = {'zdrowa': 1.05, 'umiarkowana': 1.0, 'niskiej jakości': 0.95}
 
-    modyfikowana_srednia_zycia = srednia_zycia * zdrowie_modyfikator[zdrowie] * uzywki_modyfikator[uzywki] * styl_zycia_modyfikator[styl_zycia]
+    modyfikowana_srednia_zycia = (srednia_zycia * zdrowie_modyfikator[zdrowie] * uzywki_modyfikator[uzywki]
+                                  * styl_zycia_modyfikator[styl_zycia] * styl_odzywiania_modyfikator[styl_odzywiania])
     wyniki = []
     for _ in range(liczba_symulacji):
         lata_spotkan = max(0, int(modyfikowana_srednia_zycia - wiek_start))
@@ -30,29 +32,24 @@ srednia_zycia = 81 if rodzic == 'Mama' else 74
 zdrowie = st.selectbox('Stan zdrowia:', ['dobry', 'średni', 'zły'])
 uzywki = st.selectbox('Stosowanie używek:', ['nie', 'tak'])
 styl_zycia = st.selectbox('Styl życia:', ['aktywny', 'umiarkowany', 'siedzący'])
+styl_odzywiania = st.selectbox('Styl odżywiania:', ['zdrowa', 'umiarkowana', 'niskiej jakości'])
 liczba_symulacji = st.slider('Liczba symulacji:', 1000, 10000, 5000)
 
 if st.button('Uruchom symulację'):
-    wyniki = monte_carlo_simulacja(wiek_start, srednia_spotkan, srednia_zycia, zdrowie, uzywki, styl_zycia, liczba_symulacji)
+    wyniki = monte_carlo_simulacja(wiek_start, srednia_spotkan, srednia_zycia, zdrowie, uzywki, styl_zycia, styl_odzywiania, liczba_symulacji)
     st.subheader('Wyniki symulacji')
     srednia_spotkan = np.mean(wyniki)
     mediana_spotkan = np.median(wyniki)
     st.write(f'Średnia liczba przewidywanych spotkań: {srednia_spotkan:.2f}')
     st.write(f'Mediana liczby przewidywanych spotkań: {mediana_spotkan:.2f}')
 
-    # Podsumowanie i rekomendacje
+    st.subheader("Do przemyślenia:")
     if srednia_spotkan < 20:
-        st.subheader("Do przemyślenia:")
         st.write("🌱 Liczba przewidywanych spotkań wydaje się być dość niska. Może warto zastanowić się nad sposobami na częstsze spotkania?")
     elif srednia_spotkan < 100:
-        st.subheader("Do przemyślenia:")
         st.write("💞 Umiarkowana liczba spotkań to wspaniała okazja, aby pielęgnować relacje.")
     else:
-        st.subheader("Do przemyślenia:")
         st.write("🎉 Wygląda na to, że liczba przewidywanych spotkań jest wysoka, co jest fantastyczne!")
-
-    st.write('Detalizacja wszystkich symulowanych wyników:')
-    st.dataframe(wyniki)
 
     st.subheader("Pamiętaj, że to tylko symulacja")
     st.write("""
