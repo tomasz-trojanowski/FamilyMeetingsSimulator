@@ -1,44 +1,62 @@
 import streamlit as st
 import numpy as np
 
-def monte_carlo_simulacja(srednia_spotkan, odchylenie_std, wiek_start, srednia_zycia, zdrowie, uzywki, liczba_symulacji):
-    modyfikator_zdrowia = 1.0 + (0.1 if zdrowie == 'dobry' else -0.1 if zdrowie == 'zły' else 0)
-    modyfikator_uzywki = 1.0 - (0.1 if uzywki else 0)
-    modyfikowana_srednia_zycia = srednia_zycia * modyfikator_zdrowia * modyfikator_uzywki
+def monte_carlo_simulacja(wiek_start, srednia_spotkan, srednia_zycia, zdrowie, uzywki, styl_zycia, liczba_symulacji):
+    zdrowie_modyfikator = {'dobry': 1.1, 'średni': 1.0, 'zły': 0.9}
+    uzywki_modyfikator = {'tak': 0.9, 'nie': 1.0}
+    styl_zycia_modyfikator = {'aktywny': 1.05, 'umiarkowany': 1.0, 'siedzący': 0.95}
 
+    modyfikowana_srednia_zycia = srednia_zycia * zdrowie_modyfikator[zdrowie] * uzywki_modyfikator[uzywki] * styl_zycia_modyfikator[styl_zycia]
     wyniki = []
     for _ in range(liczba_symulacji):
-        max_lata = np.random.normal(modyfikowana_srednia_zycia, 5)
-        lata_spotkan = max(0, int(max_lata - wiek_start))
-        spotkania_rocznie = np.random.normal(srednia_spotkan, odchylenie_std, lata_spotkan)
-        totalne_spotkania = np.sum(spotkania_rocznie)
+        lata_spotkan = max(0, int(modyfikowana_srednia_zycia - wiek_start))
+        totalne_spotkania = srednia_spotkan * lata_spotkan
         wyniki.append(totalne_spotkania)
     return wyniki
 
 # Ustawienie Streamlit
 st.set_page_config(page_title='Symulacja Spotkań Rodzinnych', layout='wide')
 st.title('Symulacja przyszłych spotkań z rodzicami')
+st.image('path_to_image.jpg', caption='Rodzinne chwile')  # Zmień 'path_to_image.jpg' na ścieżkę do Twojego obrazu
 
-role = st.radio("Wybierz swoją rolę:", ('Dziecko', 'Rodzic'))
+st.header("Czy wiesz, że liczba spotkań z Twoimi rodzicami jest policzalna?")
+st.write("""
+Zastanawiałeś się kiedyś, ile razy jeszcze będziesz mógł spotkać się ze swoimi rodzicami? Nasza symulacja pomoże Ci oszacować tę liczbę na podstawie kilku kluczowych czynników.
+Przejdźmy do szczegółów i zobaczmy, jak możesz wykorzystać te informacje do lepszego planowania czasu z rodziną!
+""")
 
-if role == 'Dziecko':
-    st.sidebar.header('Parametry symulacji dla Dziecka')
-    wiek_start = st.sidebar.slider('Wiek twojego rodzica:', min_value=18, max_value=100, value=50)
-elif role == 'Rodzic':
-    st.sidebar.header('Parametry symulacji dla Rodzica')
-    wiek_start = st.sidebar.slider('Twój wiek:', min_value=18, max_value=100, value=50)
-
-srednia_spotkan = st.sidebar.slider('Średnia liczba spotkań na rok:', min_value=1, max_value=52, value=10)
-odchylenie_std = st.sidebar.slider('Odchylenie standardowe spotkań:', min_value=0, max_value=10, value=2)
-srednia_zycia = st.sidebar.slider('Średnia długość życia:', min_value=60, max_value=100, value=74)
-zdrowie = st.sidebar.selectbox('Stan zdrowia:', ['dobry', 'neutralny', 'zły'])
-uzywki = st.sidebar.checkbox('Czy regularnie stosowane są używki?')
-liczba_symulacji = st.sidebar.slider('Liczba symulacji:', min_value=1000, max_value=10000, value=5000)
+rodzic = st.selectbox('Wybierz rodzica:', ['Mama', 'Tata'])
+wiek_start = st.slider('Wiek rodzica:', 18, 100, 50)
+srednia_spotkan = st.slider('Średnia liczba spotkań na rok:', 1, 52, 10)
+srednia_zycia = 81 if rodzic == 'Mama' else 74
+zdrowie = st.selectbox('Stan zdrowia:', ['dobry', 'średni', 'zły'])
+uzywki = st.selectbox('Stosowanie używek:', ['nie', 'tak'])
+styl_zycia = st.selectbox('Styl życia:', ['aktywny', 'umiarkowany', 'siedzący'])
+liczba_symulacji = st.slider('Liczba symulacji:', 1000, 10000, 5000)
 
 if st.button('Uruchom symulację'):
-    wyniki = monte_carlo_simulacja(srednia_spotkan, odchylenie_std, wiek_start, srednia_zycia, zdrowie, uzywki, liczba_symulacji)
+    wyniki = monte_carlo_simulacja(wiek_start, srednia_spotkan, srednia_zycia, zdrowie, uzywki, styl_zycia, liczba_symulacji)
     st.subheader('Wyniki symulacji')
-    st.write(f'Średnia liczba przewidywanych spotkań: {np.mean(wyniki):.2f}')
-    st.write(f'Mediana liczby przewidywanych spotkań: {np.median(wyniki):.2f}')
+    srednia_spotkan = np.mean(wyniki)
+    mediana_spotkan = np.median(wyniki)
+    st.write(f'Średnia liczba przewidywanych spotkań: {srednia_spotkan:.2f}')
+    st.write(f'Mediana liczby przewidywanych spotkań: {mediana_spotkan:.2f}')
+
+    # Podsumowanie i rekomendacje
+    if srednia_spotkan < 20:
+        st.subheader("Do przemyślenia:")
+        st.write("🌱 Liczba przewidywanych spotkań wydaje się być dość niska. Może warto zastanowić się nad sposobami na częstsze spotkania?")
+    elif srednia_spotkan < 100:
+        st.subheader("Do przemyślenia:")
+        st.write("💞 Umiarkowana liczba spotkań to wspaniała okazja, aby pielęgnować relacje.")
+    else:
+        st.subheader("Do przemyślenia:")
+        st.write("🎉 Wygląda na to, że liczba przewidywanych spotkań jest wysoka, co jest fantastyczne!")
+
     st.write('Detalizacja wszystkich symulowanych wyników:')
     st.dataframe(wyniki)
+
+    st.subheader("Pamiętaj, że to tylko symulacja")
+    st.write("""
+    Wyniki prezentowane powyżej są wynikiem symulacji metodą Monte Carlo, która polega na wielokrotnym losowaniu próbek z określonych rozkładów prawdopodobieństwa, aby oszacować niepewne wyniki. Każda symulacja jest uproszczeniem i nie może dokładnie przewidzieć przyszłości, dlatego ważne jest, aby traktować te wyniki jako orientacyjne i używać ich do inspiracji do tworzenia wartościowych relacji rodzinnych.
+    """)
