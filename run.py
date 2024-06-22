@@ -1,14 +1,12 @@
 import streamlit as st
 import numpy as np
 
-def monte_carlo_simulacja(wiek_start, srednia_spotkan, srednia_zycia, zdrowie, uzywki, styl_zycia, styl_odzywiania, liczba_symulacji):
+def monte_carlo_simulacja(wiek_start, srednia_spotkan, srednia_zycia, zdrowie, uzywki, styl_zycia, liczba_symulacji):
     zdrowie_modyfikator = {'dobry': 1.1, 'średni': 1.0, 'zły': 0.9}
     uzywki_modyfikator = {'tak': 0.9, 'nie': 1.0}
     styl_zycia_modyfikator = {'aktywny': 1.05, 'umiarkowany': 1.0, 'siedzący': 0.95}
-    styl_odzywiania_modyfikator = {'zdrowa': 1.05, 'umiarkowana': 1.0, 'niskiej jakości': 0.95}
 
-    modyfikowana_srednia_zycia = (srednia_zycia * zdrowie_modyfikator[zdrowie] * uzywki_modyfikator[uzywki]
-                                  * styl_zycia_modyfikator[styl_zycia] * styl_odzywiania_modyfikator[styl_odzywiania])
+    modyfikowana_srednia_zycia = srednia_zycia * zdrowie_modyfikator[zdrowie] * uzywki_modyfikator[uzywki] * styl_zycia_modyfikator[styl_zycia]
     wyniki = []
     for _ in range(liczba_symulacji):
         lata_spotkan = max(0, int(modyfikowana_srednia_zycia - wiek_start))
@@ -32,11 +30,10 @@ srednia_zycia = 81 if rodzic == 'Mama' else 74
 zdrowie = st.selectbox('Stan zdrowia:', ['dobry', 'średni', 'zły'])
 uzywki = st.selectbox('Stosowanie używek:', ['nie', 'tak'])
 styl_zycia = st.selectbox('Styl życia:', ['aktywny', 'umiarkowany', 'siedzący'])
-styl_odzywiania = st.selectbox('Styl odżywiania:', ['zdrowa', 'umiarkowana', 'niskiej jakości'])
 liczba_symulacji = st.slider('Liczba symulacji:', 1000, 10000, 5000)
 
 if st.button('Uruchom symulację'):
-    wyniki = monte_carlo_simulacja(wiek_start, srednia_spotkan, srednia_zycia, zdrowie, uzywki, styl_zycia, styl_odzywiania, liczba_symulacji)
+    wyniki = monte_carlo_simulacja(wiek_start, srednia_spotkan, srednia_zycia, zdrowie, uzywki, styl_zycia, liczba_symulacji)
     st.subheader('Wyniki symulacji')
     srednia_spotkan = np.mean(wyniki)
     mediana_spotkan = np.median(wyniki)
@@ -55,3 +52,9 @@ if st.button('Uruchom symulację'):
     st.write("""
     Wyniki prezentowane powyżej są wynikiem symulacji metodą Monte Carlo, która polega na wielokrotnym losowaniu próbek z określonych rozkładów prawdopodobieństwa, aby oszacować niepewne wyniki. Każda symulacja jest uproszczeniem i nie może dokładnie przewidzieć przyszłości, dlatego ważne jest, aby traktować te wyniki jako orientacyjne i używać ich do inspiracji do tworzenia wartościowych relacji rodzinnych.
     """)
+
+# Stopka z danymi kontaktowymi
+st.markdown('---')
+st.markdown('**Autor**: Tomasz Trojanowski')
+st.markdown('**E-mail**: [tomaszt@icelandair.is](mailto:tomaszt@icelandair.is)')
+
